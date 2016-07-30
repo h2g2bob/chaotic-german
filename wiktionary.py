@@ -6,6 +6,26 @@ import re
 import urllib
 
 
+def format_meaning(meaning):
+	meaning = meaning.strip()
+
+	# [[bar]] and [[foo|bar]] -> bar
+	meaning = re.sub(ur'\[\[([^\[\]\|]+\|)?([^\[\]]+)\]\]', ur'\2', meaning, flags=re.U)
+
+	# {{lb|de|attributive|stressed}} -> (attributive|stressed)
+	meaning = re.sub(ur'\{\{lb\|[a-z]+\|(.*?)\}\}', ur'<font color="gray">(\1)</font>', meaning, flags=re.U)
+
+	# {{l|en|so}} -> so
+	meaning = re.sub(ur'\{\{l\|[a-z]+\|(.*?)\}\}', ur'\1', meaning, flags=re.U)
+
+	# {{m|de|wie}} -> 'wie'
+	meaning = re.sub(ur'\{\{m\|[a-z]+\|(.*?)\}\}', ur'\'\1\'', meaning, flags=re.U)
+
+	# {{template}} -> (template)
+	meaning = meaning.replace("{{", "<font style=\"color: pink\">(").replace("}}", ")</font>")
+
+	return meaning
+
 def translate(word):
 	revision = revision_from_page(lookup(word))
 	sections = parse_sections(revision)
@@ -14,7 +34,7 @@ def translate(word):
 	if not meanings:
 		raise ValueError(german_section)
 	return u'\n\n'.join(
-		meaning.strip()
+		format_meaning(meaning)
 		for meaning in meanings)
 
 
