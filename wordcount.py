@@ -1,4 +1,5 @@
 from collections import defaultdict
+import logging
 import operator
 import os
 import os.path
@@ -25,12 +26,3 @@ def words_by_frequency():
 		words[word] += 1
 
 	return tuple(sorted(words.items(), key=operator.itemgetter(1), reverse=True))
-
-
-def main():
-	for word, count in words_by_frequency():
-		print word.encode("utf8"), count
-
-
-if __name__ == '__main__':
-	main()
